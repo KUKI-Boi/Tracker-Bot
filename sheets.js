@@ -4,13 +4,13 @@ const path = require('path');
 const SHEET_ID = process.env.SHEET_ID;          // Set in .env
 const TAB_NAME = 'Task Tracker';                // Must match the sheet tab name
 
-// Authenticate using the service-account credentials file
+// Authenticate using env var (Railway) or local credentials file (dev)
 function getAuth() {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: path.join(__dirname, 'credentials.json'),
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
-  return auth;
+  const authConfig = process.env.GOOGLE_CREDENTIALS
+    ? { credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS), scopes: ['https://www.googleapis.com/auth/spreadsheets'] }
+    : { keyFile: path.join(__dirname, 'credentials.json'),       scopes: ['https://www.googleapis.com/auth/spreadsheets'] };
+
+  return new google.auth.GoogleAuth(authConfig);
 }
 
 /**
